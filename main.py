@@ -13,10 +13,15 @@ divs = soup.find_all('div', {'data-mce-fragment': '1'})
 result = {}
 
 # Extract the keys and values from these divs
-for div in divs:
-    if div.strong is not None:
-        key = div.strong.get_text(strip=True)
-        value = div.get_text(strip=True).replace(key, '').strip()
+for i in range(len(divs)):
+    if divs[i].strong is not None:
+        key = divs[i].strong.get_text(strip=True)
+        # If the key is one of the special keys, look for the value in the next div
+        if key in ["CANTINA", "TEMPERATURA DI SERVIZIO", "NAZIONE"]:
+            if i+1 < len(divs):
+                value = divs[i+1].get_text(strip=True)
+        else:
+            value = divs[i].get_text(strip=True).replace(key, '').strip()
         result[key] = value
 
 # Print the keys and values
