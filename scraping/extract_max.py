@@ -1,18 +1,18 @@
 import requests
 from bs4 import BeautifulSoup
 
-url = 'https://www.cartadeivinicdv.com/collections/la-nostra-selezione/products/tristan-hyest-borde-de-marne?variant=37853465411733'
-response = requests.get(url)
-response_content = response.text
 
-soup = BeautifulSoup(response_content, 'html.parser')
+def extract_max(url):
+    response = requests.get(url)
+    response_content = response.text
 
-# Find the divs containing the information
-divs = soup.find_all('div', {'data-mce-fragment': '1'})
+    soup = BeautifulSoup(response_content, 'html.parser')
 
-result = {}
+    # Find the divs containing the information
+    divs = soup.find_all('div', {'data-mce-fragment': '1'})
 
-def extract_max():
+    result = {}
+
     # Extract the keys and values from these divs
     for i in range(len(divs)):
         if divs[i].strong is not None:

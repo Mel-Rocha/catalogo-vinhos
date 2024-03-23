@@ -1,18 +1,18 @@
 import requests
 from bs4 import BeautifulSoup, NavigableString
 
-url = 'https://www.cartadeivinicdv.com/collections/la-nostra-selezione/products/tristan-hyest-borde-de-marne?variant=37853465411733'
-response = requests.get(url)
-response_content = response.text
 
-soup = BeautifulSoup(response_content, 'html.parser')
+def extract_min(url):
+    response = requests.get(url)
+    response_content = response.text
 
-# Find the strong tags containing the keys
-strongs = soup.find_all('strong')
+    soup = BeautifulSoup(response_content, 'html.parser')
 
-result = {}
+    # Find the strong tags containing the keys
+    strongs = soup.find_all('strong')
 
-def extract_min():
+    result = {}
+
     # Extract the keys and values from these strong tags
     for strong in strongs:
         key = strong.get_text(strip=True)
@@ -33,4 +33,3 @@ def extract_min():
     # Print the keys and values
     for key, value in result.items():
         print(f'{key}: {value}')
-
