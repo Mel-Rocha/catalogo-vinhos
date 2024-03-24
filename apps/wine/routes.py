@@ -11,6 +11,7 @@ from apps.wine.schema import WineSchema
 from scraping.extract_max import extract_max
 from scraping.extract_min import extract_min
 from apps.wine.exceptions import ExtractionFailedException
+from apps.wine.utils import save_to_database
 
 router = APIRouter()
 
@@ -41,6 +42,9 @@ async def extract_wine(url: str = Path(..., title="The URL of the wine")):
 
         if not result_max and not result_min:
             raise ExtractionFailedException(status_code=400, detail="Extraction Failed")
+
+        if result_max and result_min:
+            await save_to_database(result_max, result_min)
 
         return JSONResponse(
             content={
