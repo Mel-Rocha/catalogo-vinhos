@@ -25,7 +25,8 @@ async def get_wine_all() -> Page[WineSchema]:
 add_pagination(router)
 
 
-async def extract(url: str):
+@router.get("/{url:path}")
+async def extract_wine(url: str = Path(..., title="The URL of the wine")):
     try:
         parsed_url = urlparse(url)
         if not parsed_url.netloc.startswith('www.cartadeivinicdv.com') or '/products/' not in parsed_url.path:
@@ -76,6 +77,3 @@ async def extract(url: str):
             status_code=500
         )
 
-@router.get("/{url:path}")
-async def extract_wine(url: str = Path(..., title="The URL of the wine")):
-    return await extract(url)
