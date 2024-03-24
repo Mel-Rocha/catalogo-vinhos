@@ -4,12 +4,12 @@ from urllib.parse import urlparse, unquote
 
 from fastapi_pagination import Page, add_pagination, paginate
 from fastapi import APIRouter, Path, HTTPException
+from fastapi.responses import JSONResponse
 
 from apps.wine.models import Wine
 from apps.wine.schema import WineSchema
 from scraping.extract_max import extract_max
 from scraping.extract_min import extract_min
-
 
 router = APIRouter()
 
@@ -25,11 +25,11 @@ add_pagination(router)
 
 
 async def extract(url: str):
-    parsed_url = urlparse(url)
-    if not parsed_url.netloc.startswith('www.cartadeivinicdv.com') or '/products/' not in parsed_url.path:
-        raise HTTPException(status_code=400, detail="Invalid URL")
-
     try:
+        parsed_url = urlparse(url)
+        if not parsed_url.netloc.startswith('www.cartadeivinicdv.com') or '/products/' not in parsed_url.path:
+            raise HTTPException(status_code=400, detail="Invalid URL")
+
         url = unquote(url)
         loop = asyncio.get_event_loop()
 
@@ -37,16 +37,32 @@ async def extract(url: str):
             result_max = await loop.run_in_executor(executor, extract_max, url)
             result_min = await loop.run_in_executor(executor, extract_min, url)
 
-        return result_max, result_min
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        return JSONResponse(
+            content={
+                "message": "Extraction successful",
+                "data": {"max": result_max, "min": result_min}
+            },
+            status_code=200
+        )
+    except HTTPException:
+        return JSONResponse(
+            content={
+                "message": "Padrão de URL esperado: "
+                           "https://www.cartadeivinicdv.com/products/",
 
+                "data": {}
+            },
+            status_code=400
+        )
+    except Exception as e:
+        return JSONResponse(
+            content={
+                "message": str(e),
+                "data": {}
+            },
+            status_code=500
+        )
 
 @router.get("/{url:path}")
 async def extract_wine(url: str = Path(..., title="The URL of the wine")):
-    try:
-        url = unquote(url)
-        result_max, result_min = await extract(url)
-        return {"max": result_max, "min": result_min}
-    except HTTPException as e:
-        return {"error": str(e.detail)}
+    return await extract(url)
