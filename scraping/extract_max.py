@@ -31,3 +31,5 @@ def extract_max(url):
     # Print the keys and values
     for key, value in result.items():
         print(f'{key}: {value}')
+
+    return result
