@@ -1,7 +1,15 @@
+aiosqlite==0.17.0
+atlastk==0.13.3
 beautifulsoup4==4.12.3
 certifi==2024.2.2
 charset-normalizer==3.3.2
 idna==3.6
+iso8601==1.1.0
+pypika-tortoise==0.1.6
+pytz==2024.1
 requests==2.31.0
 soupsieve==2.5
+tortoise==0.1.1
+tortoise-orm==0.20.0
+typing_extensions==4.10.0
 urllib3==2.2.1
