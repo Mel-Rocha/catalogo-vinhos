@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 from fastapi.middleware.cors import CORSMiddleware
 from tortoise.contrib.fastapi import register_tortoise
 
+from apps.auth.middlewares import AuthMiddleware
 from apps.wine import routes as wine_router
 
 load_dotenv()
@@ -22,6 +23,7 @@ def init_db(instance: FastAPI) -> None:
 def create_application() -> FastAPI:
     application = FastAPI()
 
+    application.add_middleware(AuthMiddleware)
     application.add_middleware(
         CORSMiddleware,
         allow_origins=["*"],
