@@ -10,6 +10,7 @@ from apps.wine.models import Wine
 from apps.wine.schema import WineSchema
 from scraping.extract_max import extract_max
 from scraping.extract_min import extract_min
+from apps.wine.exceptions import ExtractionFailedException
 
 router = APIRouter()
 
@@ -37,6 +38,9 @@ async def extract(url: str):
             result_max = await loop.run_in_executor(executor, extract_max, url)
             result_min = await loop.run_in_executor(executor, extract_min, url)
 
+        if not result_max and not result_min:
+            raise ExtractionFailedException(status_code=400, detail="Extraction Failed")
+
         return JSONResponse(
             content={
                 "message": "Extraction successful",
@@ -44,12 +48,21 @@ async def extract(url: str):
             },
             status_code=200
         )
+
     except HTTPException:
         return JSONResponse(
             content={
                 "message": "Padrão de URL esperado: "
                            "https://www.cartadeivinicdv.com/products/",
 
+                "data": {}
+            },
+            status_code=400
+        )
+    except ExtractionFailedException:
+        return JSONResponse(
+            content ={
+                "message": "A extração não retornou resultado",
                 "data": {}
             },
             status_code=400
